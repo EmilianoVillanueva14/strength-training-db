@@ -114,17 +114,32 @@ cannot read a file in your own home folder.
 
 ## What the data says
 
+Every number below is returned by the queries in this repository, not
+estimated.
+
 - 2,643 of 2,799 parsed rows are actual recorded sets. The other 156
   are rest days, skipped days and header lines, kept so gaps in
   training stay visible.
-- 2,446 sets survive the filter into `working_sets`. The rest are
-  warmups, cardio, bodyweight movements with no external load, or sets
-  missing a weight or a rep count.
-- 163 sets (6.2%) come from blocks of the notes written from memory
+- 2,421 sets survive the filter into `working_sets`. The rest are
+  warmups, cardio, bodyweight movements carrying no external load, or
+  sets missing a weight or a rep count.
+- 157 sets (5.9%) come from blocks of the notes written from memory
   rather than logged during the session. They are flagged
   `unverified_block` and can be excluded from any query.
-- The most trained movement is the lat pulldown at 199 working sets.
-  Flat barbell bench press is the most trained barbell lift at 78.
+- 26 sets fail the plausibility check: 23 recorded as 0 lb without being
+  marked bodyweight (mostly drop sets stripped to an empty bar or
+  machine), and 3 impossible rep counts.
+
+Most trained movements, by working sets:
+
+| Exercise | Muscle group | Sets | Sessions | Best | Total volume |
+|---|---|---:|---:|---:|---:|
+| Lat Pulldown | Back | 199 | 89 | 256 lb | 279,428 lb |
+| Tricep Pushdown | Triceps | 93 | 39 | 198 lb | 63,186 lb |
+| Cable Row | Back | 90 | 40 | 290 lb | 132,023 lb |
+| Flat Barbell Bench Press | Chest | 77 | 39 | 285 lb | 130,898 lb |
+| Dumbbell Shoulder Press | Shoulders | 72 | 32 | 80 lb | 41,113 lb |
+| Romanian Deadlift | Hamstrings | 70 | 33 | 265 lb | 117,794 lb |
 
 ---
 
@@ -135,8 +150,9 @@ cannot read a file in your own home folder.
   volume totals. Fixing that would mean tracking bodyweight over time,
   which was not logged consistently enough to use.
 - **Three rep counts are impossible** and are excluded, not corrected:
-  300x100, 235x60 and 100x100 are all stray zeros. The original text is
-  kept in `raw_line` so the call can be checked.
+  `Donkey Press 300x100`, `Flat Bench 235x60` and `SA High Row 100x100`
+  are all stray zeros. The original text is kept in `raw_line` so the
+  call can be checked rather than taken on trust.
 - **Volume is weight x reps.** It ignores rest, tempo and proximity to
   failure, so it compares like with like over time but should not be
   read as a measure of training quality.
