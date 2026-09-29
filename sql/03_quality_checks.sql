@@ -59,14 +59,17 @@ SELECT s.set_id,
                                                  THEN 'zero weight, not bodyweight'
          WHEN s.reps IS NULL AND s.weight_lb IS NULL
                                                  THEN 'set recorded with no numbers'
+         WHEN x.source_line IS NOT NULL          THEN 'manually excluded: ' || x.reason
        END AS reason
 FROM   sets s
 JOIN   workouts  w USING (workout_id)
 JOIN   exercises e USING (exercise_id)
+LEFT   JOIN excluded_sets x ON x.source_line = s.source_line
 WHERE  s.reps > 30
    OR  s.weight_lb > 500
    OR (s.weight_lb = 0 AND s.orig_unit <> 'bw')
-   OR (s.reps IS NULL AND s.weight_lb IS NULL);
+   OR (s.reps IS NULL AND s.weight_lb IS NULL)
+   OR  x.source_line IS NOT NULL;
 
 SELECT * FROM suspect_sets ORDER BY workout_date;
 

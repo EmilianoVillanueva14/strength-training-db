@@ -96,6 +96,14 @@ WHERE  s.logged_sets::BOOLEAN
 
 
 -- ------------------------------------------------------------
+-- Manual exclusions
+-- ------------------------------------------------------------
+INSERT INTO excluded_sets (source_line, reason) VALUES
+  (1647, 'Squat 25x8/25x12 on 2026-08-31. 250 lb below the surrounding months and I cannot account for it. Weight is not trustworthy, so the sets are excluded rather than guessed at.')
+ON CONFLICT (source_line) DO NOTHING;
+
+
+-- ------------------------------------------------------------
 -- Load check. All three numbers should match exactly.
 -- ------------------------------------------------------------
 SELECT 'exercises' AS table_name, COUNT(*) AS rows, 272 AS expected FROM exercises

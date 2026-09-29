@@ -60,10 +60,16 @@ original notes it came from.
 
 Two views sit on top:
 
-| View | Purpose |
+| Object | Purpose |
 |---|---|
-| `suspect_sets` | Rows that fail a plausibility check, with the reason |
-| `working_sets` | The analysable subset — warmups, cardio, bodyweight and suspect rows removed |
+| `excluded_sets` | Table of manual exclusions, keyed on `source_line`, each with a written reason |
+| `suspect_sets` | View of rows failing a plausibility rule or manually excluded, with the reason |
+| `working_sets` | View of the analysable subset — warmups, cardio, bodyweight and suspect rows removed |
+
+Exclusions are keyed on `source_line` rather than `set_id` so the list
+survives a full reload. `excluded_sets` is the only place judgement is
+applied to the data, every entry carries a reason, and it sits in the
+repository where anyone can check the call.
 
 ---
 
@@ -120,15 +126,15 @@ estimated.
 - 2,643 of 2,799 parsed rows are actual recorded sets. The other 156
   are rest days, skipped days and header lines, kept so gaps in
   training stay visible.
-- 2,421 sets survive the filter into `working_sets`. The rest are
-  warmups, cardio, bodyweight movements carrying no external load, or
-  sets missing a weight or a rep count.
+- 2,419 sets survive the filter into `working_sets`. The rest are
+  warmups, bodyweight movements carrying no external load, or sets
+  missing a weight or a rep count.
 - 157 sets (5.9%) come from blocks of the notes written from memory
   rather than logged during the session. They are flagged
   `unverified_block` and can be excluded from any query.
-- 26 sets fail the plausibility check: 23 recorded as 0 lb without being
-  marked bodyweight (mostly drop sets stripped to an empty bar or
-  machine), and 3 impossible rep counts.
+- 28 sets are held out of the analysis: 23 recorded as 0 lb without
+  being marked bodyweight (mostly drop sets stripped to an empty bar or
+  machine), 3 impossible rep counts, and 2 excluded by hand.
 
 Most trained movements, by working sets:
 
@@ -153,6 +159,19 @@ Most trained movements, by working sets:
   `Donkey Press 300x100`, `Flat Bench 235x60` and `SA High Row 100x100`
   are all stray zeros. The original text is kept in `raw_line` so the
   call can be checked rather than taken on trust.
+- **Two squat sets are excluded by hand.** `Squat 25x8/ 25x12` on
+  2026-08-31 sits 250 lb below the surrounding months with no
+  explanation in the notes. The weight cannot be verified, so the sets
+  are held out rather than guessed at. Without them the lightest
+  recorded back squat is 155 lb.
+- **Failure sets carry no rep count.** 29 of the 30 sets marked
+  `to_failure` have `reps` NULL, because the note says `xfail` rather
+  than a number. They are therefore absent from `working_sets`, and
+  query 8 reads from `sets` directly for that reason.
+- **Cardio never reaches `sets`.** The 16 rows flagged `is_cardio` in
+  the CSV all have `logged_sets` false, so they stop at staging. The
+  column is kept on `sets` anyway so the flag has somewhere to live if
+  cardio is ever logged as sets.
 - **Volume is weight x reps.** It ignores rest, tempo and proximity to
   failure, so it compares like with like over time but should not be
   read as a measure of training quality.

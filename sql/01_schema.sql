@@ -121,6 +121,22 @@ COMMENT ON COLUMN sets.weight_lb IS
 
 
 -- ------------------------------------------------------------
+-- Manual exclusions
+--
+-- Rows the plausibility rules cannot catch but that I know are wrong,
+-- keyed on source_line rather than set_id so the list survives a full
+-- reload. Each one needs a written reason. This is the only place
+-- judgement gets applied to the data, and it is visible in the repo.
+-- ------------------------------------------------------------
+DROP TABLE IF EXISTS excluded_sets CASCADE;
+
+CREATE TABLE excluded_sets (
+  source_line  INT PRIMARY KEY,
+  reason       TEXT NOT NULL CHECK (reason <> '')
+);
+
+
+-- ------------------------------------------------------------
 -- Indexes
 --
 -- The three access patterns this database actually has:
