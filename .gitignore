@@ -1,0 +1,17 @@
+# DBeaver
+.dbeaver/
+*.dbeaver-data-sources.xml
+
+# OS
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Editors
+.vscode/
+.idea/
+
+# Local dumps and scratch
+*.dump
+*.backup
+_scratch/
